@@ -29,7 +29,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh "docker build -t esinkirill/test-jenkins-image:latest --build-arg BUILD_DATE=$(date +%Y-%m-%dT%H:%M:%S%z) ."
+                    sh 'docker build -t esinkirill/test-jenkins-image:latest --build-arg BUILD_DATE=$(date +%Y-%m-%dT%H:%M:%S%z) .'
                 }
             }
         }
