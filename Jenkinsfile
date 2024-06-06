@@ -30,7 +30,8 @@ pipeline {
             steps {
                 script {
                     // Пересборка образа
-                    docker.build('esinkirill/test-jenkins-image:latest', '--build-arg', 'BUILD_DATE=$(date -u +\"%Y-%m-%dT%H:%M:%SZ\")')
+                    docker.build('esinkirill/test-jenkins-image:latest', '--build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")')
+
                 }
             }
         }
