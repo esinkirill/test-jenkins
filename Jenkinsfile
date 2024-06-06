@@ -54,12 +54,16 @@ def findAvailablePort() {
     def port = 5003
     def socket = new java.net.ServerSocket()
     try {
-        socket.bind(new java.net.InetSocketAddress(port))
-        return port
-    } catch (java.net.BindException e) {
-        port++
-        return findAvailablePort(port)
+        while (true) {
+            try {
+                socket.bind(new java.net.InetSocketAddress("localhost", port))
+                return port
+            } catch (java.net.BindException e) {
+                port++
+            }
+        }
     } finally {
         socket.close()
     }
 }
+
