@@ -29,8 +29,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Пересборка образа
-                    docker.build('esinkirill/test-jenkins-image:latest', "--build-arg BUILD_DATE='2024-06-06T23:21:36Z'")
+                    sh "docker build -t esinkirill/test-jenkins-image:latest --build-arg BUILD_DATE=2024-06-06T23:21:36Z ."
+
                 }
             }
         }
