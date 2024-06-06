@@ -10,8 +10,8 @@ pipeline {
         stage('Build on Remote Host') {
             environment {
                 REMOTE_HOST = '188.120.225.17' // IP адрес удаленного хоста
-                REMOTE_USER = 'your_username' // Имя пользователя для доступа к удаленному хосту
-                REMOTE_DIR = '/path/to/project' // Путь до проекта на удаленном хосте
+                REMOTE_USER = 'esinkirill' // Имя пользователя для доступа к удаленному хосту
+                REMOTE_DIR = '/home/esinkirill/test-jenkins/test-jenkins/' // Путь до проекта на удаленном хосте
             }
             steps {
                 // Копирование проекта на удаленный хост
