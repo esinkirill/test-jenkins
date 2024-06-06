@@ -1,26 +1,24 @@
 pipeline {
     agent any
-
     stages {
         stage('Checkout') {
             steps {
+                // Клонирование репозитория с помощью Git
                 git 'https://github.com/esinkirill/test-jenkins.git'
             }
         }
-        
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    docker.build('esinkirill/test-jenkins-image:latest')
-                }
+        stage('Build on Remote Host') {
+            environment {
+                REMOTE_HOST = '188.120.225.17' // IP адрес удаленного хоста
+                REMOTE_USER = 'your_username' // Имя пользователя для доступа к удаленному хосту
+                REMOTE_DIR = '/path/to/project' // Путь до проекта на удаленном хосте
             }
-        }
-
-        stage('Run Docker Container') {
             steps {
-                script {
-                    docker.image('esinkirill/test-jenkins-image:latest').run('-p 5003:5003')
-                }
+                // Копирование проекта на удаленный хост
+                sh "scp -r . ${env.REMOTE_USER}@${env.REMOTE_HOST}:${env.REMOTE_DIR}"
+                
+                // Выполнение сборки Docker образа на удаленном хосте
+                sh "ssh ${env.REMOTE_USER}@${env.REMOTE_HOST} 'cd ${env.REMOTE_DIR} && docker build -t your_image_name .'"
             }
         }
     }
