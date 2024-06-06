@@ -8,19 +8,29 @@ pipeline {
             }
         }
         
-        stage('Build Docker Image') {
+        stage('Stop and Remove Existing Container') {
             steps {
                 script {
-                    docker.build('esinkirill/test-jenkins-image:latest', '--build-arg', 'BUILD_DATE=$(date -u +\"%Y-%m-%dT%H:%M:%SZ\")')
+                    // Остановка и удаление существующего контейнера, если он существует
+                    try {
+                        docker.stop('competent_nightingale')
+                    } catch (Exception e) {
+                        // Если контейнер не удалось остановить (возможно, он не существует), продолжаем
+                    }
+                    try {
+                        docker.remove('competent_nightingale')
+                    } catch (Exception e) {
+                        // Если контейнер не удалось удалить (возможно, он не существует), продолжаем
+                    }
                 }
             }
         }
 
-        stage('Stop and Remove Existing Container') {
+        stage('Build Docker Image') {
             steps {
                 script {
-                    docker.stop('competent_nightingale')
-                    docker.remove('competent_nightingale')
+                    // Пересборка образа
+                    docker.build('esinkirill/test-jenkins-image:latest', '--build-arg', 'BUILD_DATE=$(date -u +\"%Y-%m-%dT%H:%M:%SZ\")')
                 }
             }
         }
@@ -28,6 +38,7 @@ pipeline {
         stage('Run Docker Container') {
             steps {
                 script {
+                    // Запуск нового контейнера после пересборки
                     docker.image('esinkirill/test-jenkins-image:latest').run('-p 5003:5003', '--name competent_nightingale')
                 }
             }
