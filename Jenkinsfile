@@ -11,7 +11,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build('esinkirill/test-jenkins-image:latest', '', '--no-cache')
+                    docker.build('esinkirill/test-jenkins-image:latest', '--no-cache')
                 }
             }
         }
