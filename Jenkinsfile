@@ -13,15 +13,13 @@ pipeline {
                 script {
                     // Остановка и удаление существующего контейнера, если он существует
                     try {
-                        docker.stop('competent_nightingale')
+                        sh 'docker stop competent_nightingale || true'
                     } catch (Exception e) {
-                        // Если контейнер не удалось остановить (возможно, он не существует), продолжаем
                         echo "No existing container found to stop."
                     }
                     try {
-                        docker.remove('competent_nightingale')
+                        sh 'docker rm competent_nightingale || true'
                     } catch (Exception e) {
-                        // Если контейнер не удалось удалить (возможно, он не существует), продолжаем
                         echo "No existing container found to remove."
                     }
                 }
@@ -31,7 +29,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh "docker build -t esinkirill/test-jenkins-image:latest --build-arg BUILD_DATE=2024-06-06T23:21:36Z ."
+                    sh "docker build -t esinkirill/test-jenkins-image:latest --build-arg BUILD_DATE=$(date +%Y-%m-%dT%H:%M:%S%z) ."
                 }
             }
         }
@@ -43,7 +41,7 @@ pipeline {
                     def hostPort = findAvailablePort()
 
                     // Запуск нового контейнера после пересборки
-                    docker.image('esinkirill/test-jenkins-image:latest').run("-p ${hostPort}:5003", "--name competent_nightingale")
+                    sh "docker run -d -p ${hostPort}:5003 --name competent_nightingale esinkirill/test-jenkins-image:latest"
                 }
             }
         }
@@ -52,18 +50,13 @@ pipeline {
 
 def findAvailablePort() {
     def port = 5003
-    def socket = new java.net.ServerSocket()
-    try {
-        while (true) {
-            try {
-                socket.bind(new java.net.InetSocketAddress("localhost", port))
-                return port
-            } catch (java.net.BindException e) {
-                port++
-            }
-        }
-    } finally {
-        socket.close()
+    while (!isPortAvailable(port)) {
+        port++
     }
+    return port
 }
 
+def isPortAvailable(port) {
+    def result = sh(script: "lsof -i :${port}", returnStatus: true)
+    return result != 0
+}
