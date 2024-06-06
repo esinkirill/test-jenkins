@@ -39,10 +39,27 @@ pipeline {
         stage('Run Docker Container') {
             steps {
                 script {
+                    // Поиск свободного порта на хосте
+                    def hostPort = findAvailablePort()
+
                     // Запуск нового контейнера после пересборки
-                    docker.image('esinkirill/test-jenkins-image:latest').run('-p 5003:5003', '--name competent_nightingale')
+                    docker.image('esinkirill/test-jenkins-image:latest').run("-p ${hostPort}:5003", "--name competent_nightingale")
                 }
             }
         }
+    }
+}
+
+def findAvailablePort() {
+    def port = 5003
+    def socket = new java.net.ServerSocket()
+    try {
+        socket.bind(new java.net.InetSocketAddress(port))
+        return port
+    } catch (java.net.BindException e) {
+        port++
+        return findAvailablePort(port)
+    } finally {
+        socket.close()
     }
 }
