@@ -11,8 +11,7 @@ pipeline {
         stage('Stop and Remove Existing Container') {
             steps {
                 script {
-
-
+                    // Остановка и удаление существующего контейнера, если он существует
                     try {
                         sh 'docker stop competent_nightingale || true'
                     } catch (Exception e) {
@@ -38,16 +37,10 @@ pipeline {
         stage('Run Docker Container') {
             steps {
                 script {
-
                     // Поиск свободного порта на хосте
                     def hostPort = findAvailablePort()
 
                     // Запуск нового контейнера после пересборки
-
-                   
-                    def hostPort = findAvailablePort()
-
-
                     sh "docker run -d -p ${hostPort}:5003 --name competent_nightingale esinkirill/test-jenkins-image:latest"
                 }
             }
